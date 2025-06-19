@@ -1,25 +1,25 @@
 FROM php:8.2-cli
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y git unzip
+RUN apt-get update && apt-get install -y git unzip curl
 
-# Copy composer from official composer image
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Set working directory to the root of the project
-WORKDIR /
-
-# Copy all files to container
-COPY . .
+# Clone your public GitHub repo into the image
+WORKDIR /app
+RUN git clone https://github.com/ZaloOFM/telegram.git .
 
 # Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Expose port
+# Expose port 8080
 EXPOSE 8080
 
-# Run the PHP server
+# Start PHP server from /app/public
 CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
+
+
 
 
 
