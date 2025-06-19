@@ -1,24 +1,25 @@
 FROM php:8.2-cli
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y git unzip curl
+RUN apt-get update && apt-get install -y git unzip
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Copy composer from official composer image
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /var/www
+# Set working directory to the root of the project
+WORKDIR /
 
-# Copy everything (including composer.json)
+# Copy all files to container
 COPY . .
 
-# Double check composer.json is there before install
-RUN ls -la /var/www && cat /var/www/composer.json
-
 # Install PHP dependencies
-RUN composer install
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
+# Expose port
 EXPOSE 8080
+
+# Run the PHP server
 CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
+
 
 
