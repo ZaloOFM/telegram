@@ -9,12 +9,16 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Set working directory
 WORKDIR /var/www
 
-# Copy all files
+# Copy everything (including composer.json)
 COPY . .
+
+# Double check composer.json is there before install
+RUN ls -la /var/www && cat /var/www/composer.json
 
 # Install PHP dependencies
 RUN composer install
 
 EXPOSE 8080
 CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
+
 
