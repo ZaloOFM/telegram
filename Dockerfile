@@ -1,22 +1,19 @@
 FROM php:8.2-cli
 
-# Install required packages
+# Install system dependencies
 RUN apt-get update && apt-get install -y git unzip
+
+# Set working directory
+WORKDIR /var/www
+
+# Copy existing application directory contents
+COPY . /var/www
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /app
-
-# Copy code
-COPY . .
-
-# Install dependencies
+# Run Composer install
 RUN composer install
 
-# Expose port
 EXPOSE 8080
-
-# Start the PHP built-in server
 CMD ["php", "-S", "0.0.0.0:8080", "-t", "public"]
